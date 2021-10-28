@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    hostname: zookeeper
+
+  kafka:
+    image: wurstmeister/kafka
+    command: [start-kafka.sh]
+    ports:
+      - "9092:9092"
+    hostname: localhost
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka # docker-machine ip
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+    depends_on:
+      - zookeeper
+        #    healthcheck:
+        #      test:
+        #        [ "CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181" ]
+        #      interval: 2s
+        #      timeout: 2s
+        #      retries: 10
+
+  # REST Proxy
+  service_a_rest_proxy:
+    build:
+      context: .
+      dockerfile: ./serviceA/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
+  service_b:
+    build:
+      context: .
+      dockerfile: ./serviceB/Dockerfile
+    depends_on:
+      - kafka
+
+  service_c:
+    build:
+      context: .
+      dockerfile: ./serviceC/Dockerfile
+    depends_on:
+      - kafka

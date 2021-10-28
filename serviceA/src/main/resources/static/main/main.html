@@ -1,0 +1,12 @@
+<div class="mb-3 text-center">
+    <h1>Rest proxy</h1>
+    <form class="form-signin" ng-submit="request()" style="max-width: 350px; padding: 15px; margin: 0 auto;">
+        <input type="text" ng-model="Request.name" id="inName" class="form-control" placeholder="request name"
+               style="margin-bottom: 10px;" required="">
+        <input type="text" ng-model="Request.value" id="inVal" class="form-control" placeholder="request value"
+               style="margin-bottom: 10px;" required="">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Send request</button>
+    </form>
+</div>
+<h1 ng-if="Response">Response:</h1>
+<pre>{{ Pretty }}</pre>

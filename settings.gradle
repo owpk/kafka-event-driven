@@ -1,0 +1,6 @@
+rootProject.name = 'demo'
+include 'serviceA'
+include 'serviceB'
+include 'serviceC'
+include 'global'
+
