@@ -1,0 +1,8 @@
+**/build
+README.md
+HELP.md
+.gradle
+gradle
+.idea
+gradlew
+gradlew.bat
