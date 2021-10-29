@@ -8,5 +8,3 @@ COPY . /app/
 
 RUN gradle clean build --no-daemon
 CMD gradle :serviceA:bootRun
-
-
