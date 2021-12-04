@@ -3,33 +3,30 @@ package owpk;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.context.annotation.Import;
+import ru.sparural.KafkaContainerBeanFactory;
+import ru.sparural.KafkaProducerImpl;
+import ru.sparural.common.KafkaProducer;
+import ru.sparural.common.handler.RequestHandler;
+import ru.sparural.dto.ResponseDto;
 
 @Configuration
+@Import(ru.sparural.KafkaConfigAutoconfiguration.class)
 public class KafkaConfig {
 
-    @Value("${kafka.group.id}")
+    @Value("${sparural.kafka.response.listenerGroup}")
     private String groupId;
+    @Value("${sparural.kafka.response.topic}")
+    private String serviceResponseTopic;
 
     @Bean
-    public ReplyingKafkaTemplate<String, Request, Response> replyingKafkaTemplate(ProducerFactory<String, Request> pf,
-                                                                                  ConcurrentKafkaListenerContainerFactory<String, Response> factory) {
-        ConcurrentMessageListenerContainer<String, Response> replyContainer = factory.createContainer("serviceA-response");
-        replyContainer.getContainerProperties().setMissingTopicsFatal(false);
-        replyContainer.getContainerProperties().setGroupId(groupId);
-        return new ReplyingKafkaTemplate<>(pf, replyContainer);
+    public RequestHandler requestHandler() {
+        return request -> new ResponseDto("Response A");
     }
 
     @Bean
-    public KafkaTemplate<String, Response> replyTemplate(ProducerFactory<String, Response> pf,
-                                                       ConcurrentKafkaListenerContainerFactory<String, Response> factory) {
-        KafkaTemplate<String, Response> kafkaTemplate = new KafkaTemplate<>(pf);
-        factory.getContainerProperties().setMissingTopicsFatal(false);
-        factory.setReplyTemplate(kafkaTemplate);
-        return kafkaTemplate;
+    public KafkaProducer kafkaProducer(KafkaContainerBeanFactory kafkaContainerBeanFactory) {
+        return new KafkaProducerImpl(kafkaContainerBeanFactory,
+                serviceResponseTopic, groupId);
     }
 }
